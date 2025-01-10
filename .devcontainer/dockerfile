@@ -1,0 +1,73 @@
+FROM ubuntu:24.04
+
+RUN rm -f /etc/apt/apt.conf.d/docker-clean && \
+    echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
+# install apt packege
+RUN --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && \
+    DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y --no-install-recommends \
+            bash-completion sudo wget curl ca-certificates git tzdata nano \
+            language-pack-ja
+
+# create user
+ARG WORK_USER_NAME=ubuntu
+ENV WORK_USER_NAME=${WORK_USER_NAME}
+RUN if ! getent passwd $WORK_USER_NAME > /dev/null ; then \
+        useradd -m -s /bin/bash $WORK_USER_NAME ; \
+    fi; \
+    echo $WORK_USER_NAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$WORK_USER_NAME && \
+    chmod 0440 /etc/sudoers.d/$WORK_USER_NAME
+
+# install shfmt
+RUN if [ "$(uname -m)" = 'aarch64' ] ; then \
+        cpu_arch=arm64 ; \
+    elif [ "$(uname -m)" = 'x86_64' ] ; then \
+        cpu_arch=amd64 ; \
+    else \
+        exit 1 ; \
+    fi; \
+    shfmt_path=/usr/bin/shfmt && \
+    wget -nv --no-hsts -O $shfmt_path https://github.com/mvdan/sh/releases/download/v3.8.0/shfmt_v3.8.0_linux_${cpu_arch} && \
+    chmod +x $shfmt_path
+
+# install pnpm
+ARG NODE_VERSION=22.13.0 \
+    PNPM_VERSION=9.15.3
+
+ENV PNPM_HOME="/usr/local/share/pnpm"
+ENV PATH=$PATH:${PNPM_HOME}
+RUN if [ "$(uname -m)" = 'aarch64' ] ; then \
+        cpu_arch=arm64 ; \
+    elif [ "$(uname -m)" = 'x86_64' ] ; then \
+        cpu_arch=x64 ; \
+    else \
+        exit 1 ; \
+    fi; \
+    mkdir -p ${PNPM_HOME} && \
+    wget -nv --no-hsts -O ${PNPM_HOME}/pnpm "https://github.com/pnpm/pnpm/releases/download/v${PNPM_VERSION}/pnpm-linux-${cpu_arch}" && \
+    chmod +x ${PNPM_HOME}/pnpm && \
+    pnpm completion bash > /etc/bash_completion.d/pnpm
+
+# install node
+RUN pnpm env add --global ${NODE_VERSION} && \
+    pnpm env use --global ${NODE_VERSION} && \
+    node --completion-bash > /etc/bash_completion.d/node && \
+    npm completion > /etc/bash_completion.d/npm && \
+    rm -r /root/.npm
+
+RUN su ${WORK_USER_NAME} -c ' \
+        configFile=~/.config/pnpm/rc && \
+        mkdir -p "${configFile%/*}" && \
+        echo store-dir=/home/$USER/pnpm-store/ > "$configFile" \
+    '
+
+# configure language
+ENV LANG="ja_JP.UTF-8" \
+    LANGUAGE="ja_JP:ja" \
+    LC_ALL="ja_JP.UTF-8"
+
+COPY --chmod=755 ./entrypoint.sh /
+ENTRYPOINT [ "/entrypoint.sh" ]

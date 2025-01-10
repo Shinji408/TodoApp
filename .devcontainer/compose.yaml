@@ -1,0 +1,13 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: dockerfile
+    volumes:
+      - ../:/workspace
+      - pnpm-store:/home/ubuntu/pnpm-store
+      - node_modules:/workspace/node_modules
+volumes:
+  pnpm-store:
+    name: pnpm-store
+  node_modules:

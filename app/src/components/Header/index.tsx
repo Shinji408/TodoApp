@@ -1,9 +1,13 @@
-const Header = () => {
-  return (
-    <div>
-      <h1>TODO APP</h1>
-    </div>
-  )
-}
+import { ModeToggle } from "../mode-toggle";
+import * as style from "./styles.css";
 
-export default Header
+const Header = () => {
+	return (
+		<div className={style.header}>
+			<h1>TODO APP</h1>
+			<ModeToggle />
+		</div>
+	);
+};
+
+export default Header;

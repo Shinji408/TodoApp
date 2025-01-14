@@ -1,3 +1,5 @@
+import Header from "@/components/Header";
+
 type LayoutProps = {
 	content: React.ReactNode;
 };
@@ -5,6 +7,7 @@ type LayoutProps = {
 const Layout: React.FC<LayoutProps> = ({ content }) => {
 	return (
 		<div>
+			<Header />
 			<main>{content}</main>
 		</div>
 	);

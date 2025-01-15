@@ -1,6 +1,7 @@
 import { useFetchTaskList } from "@/hooks/task";
 import type { TaskDetail } from "@/types";
 import { format } from "@formkit/tempo";
+import { Link } from "react-router-dom";
 
 export const TaskList = ({
 	listId,
@@ -22,15 +23,17 @@ export const TaskList = ({
 				{taskList?.tasks?.map((task: TaskDetail) => {
 					if (task.done) {
 						return (
-							<div key={task.id}>
-								<h3>{task.title}</h3>
-								<p>{task.detail}</p>
-								<p>
-									{task.limit
-										? format(task.limit, { date: "full", time: "short" })
-										: null}
-								</p>
-							</div>
+							<Link to={`/lists/${listId}/tasks/${task.id}`} key={task.id}>
+								<div key={task.id}>
+									<h3>{task.title}</h3>
+									<p>{task.detail}</p>
+									<p>
+										{task.limit
+											? format(task.limit, { date: "full", time: "short" })
+											: null}
+									</p>
+								</div>
+							</Link>
 						);
 					}
 				})}
@@ -42,15 +45,17 @@ export const TaskList = ({
 				{taskList?.tasks?.map((task: TaskDetail) => {
 					if (!task.done) {
 						return (
-							<div key={task.id}>
-								<h3>{task.title}</h3>
-								<p>{task.detail}</p>
-								<p>
-									{task.limit
-										? format(task.limit, { date: "full", time: "short" })
-										: null}
-								</p>
-							</div>
+							<Link to={`/lists/${listId}/tasks/${task.id}`} key={task.id}>
+								<div key={task.id}>
+									<h3>{task.title}</h3>
+									<p>{task.detail}</p>
+									<p>
+										{task.limit
+											? format(task.limit, { date: "full", time: "short" })
+											: null}
+									</p>
+								</div>
+							</Link>
 						);
 					}
 				})}

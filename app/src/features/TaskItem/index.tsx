@@ -6,7 +6,6 @@ export const TaskItem = ({
 	taskId,
 }: { listId: string; taskId: string }) => {
 	const { data: task, isLoading, isError } = useFetchTaskDetail(listId, taskId);
-	const date = "2010-06-09T15:32:00Z";
 
 	if (isLoading) {
 		return <div>Loading...</div>;
@@ -16,17 +15,21 @@ export const TaskItem = ({
 		return <div>Error loading tasks...</div>;
 	}
 
+	if (!task) {
+		return <div>Task not found</div>;
+	}
+
 	return (
 		<>
-			{task && (
-				<>
-					<h3>{task.title}</h3>
-					<p>{task.detail}</p>
-					<p>{task.limit ? format(task.limit) : null}</p>
-					<p>{format(date, { date: "medium", time: "long" })}</p>
-					<p>---</p>
-				</>
-			)}
+			<div>
+				<h1>{task.title}</h1>
+				<p>{task.detail}</p>
+				<p>
+					{task.limit
+						? format(task.limit, { date: "full", time: "short" })
+						: null}
+				</p>
+			</div>
 		</>
 	);
 };

@@ -27,8 +27,8 @@ export const CategoryList = () => {
 
 	return (
 		<>
-			<div className="display-select-wrapper">
-				<select onChange={handleIsDoneDisplayChange} className="display-select">
+			<div>
+				<select onChange={handleIsDoneDisplayChange}>
 					<option value="todo">未完了</option>
 					<option value="done">完了</option>
 				</select>
@@ -37,7 +37,7 @@ export const CategoryList = () => {
 				リスト編集
 			</Button>
 			<Button onClick={() => navigate("/list/create")}>新規リスト</Button>
-			<ul className="list-tab">
+			<ul>
 				{lists?.map((list: CategoryListResponse) => {
 					const isActive = list.id === selectListId;
 					return (

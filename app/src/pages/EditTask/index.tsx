@@ -104,13 +104,11 @@ const EditTask = () => {
 			<input
 				type="date"
 				onChange={(e) => setDate(e.target.value)}
-				className="edit-task-date"
 				value={date}
 			/>
 			<input
 				type="time"
 				onChange={(e) => setTime(e.target.value)}
-				className="edit-task-time"
 				value={time}
 			/>
 			<br />
